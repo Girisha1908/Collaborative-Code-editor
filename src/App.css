@@ -1,0 +1,271 @@
+.homePageWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    height: 100vh;
+    background: radial-gradient(ellipse at center, rgba(40, 50, 80, 0.3) 0%, transparent 70%);
+}
+
+.formWrapper {
+    background: rgba(15, 20, 40, 0.9);
+    padding: 30px;
+    border-radius: 20px;
+    width: 400px;
+    max-width: 90%;
+    border: 2px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 0 30px rgba(138, 43, 226, 0.2), inset 0 0 30px rgba(75, 0, 130, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    color: #b19cd9;
+}
+
+footer a {
+    color: #9d4edd;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.mainLabel {
+    margin-bottom: 20px;
+    margin-top: 0;
+    font-size: 18px;
+    background: linear-gradient(45deg, #9d4edd, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+}
+
+.homePageLogo {
+    height: 80px;
+    margin-bottom: 30px;
+    filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.5));
+}
+
+.inputBox {
+    padding: 12px;
+    border-radius: 8px;
+    outline: none;
+    border: 2px solid rgba(157, 78, 221, 0.3);
+    margin-bottom: 14px;
+    background: rgba(20, 25, 50, 0.8);
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.inputBox:focus {
+    border-color: #9d4edd;
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.4);
+}
+
+.inputBox::placeholder {
+    color: #b19cd9;
+}
+
+.btn {
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.joinBtn,
+.leaveBtn {
+    background: linear-gradient(45deg, #9d4edd, #c77dff);
+    color: white;
+    width: 100px;
+    margin-left: auto;
+    box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+}
+
+.joinBtn:hover,
+.leaveBtn:hover {
+    background: linear-gradient(45deg, #7b2cbf, #9d4edd);
+    box-shadow: 0 6px 20px rgba(157, 78, 221, 0.5);
+    transform: translateY(-2px);
+}
+
+.createInfo {
+    margin: 0 auto;
+    margin-top: 20px;
+    text-align: center;
+    color: #b19cd9;
+}
+
+.createNewBtn {
+    color: #c77dff;
+    text-decoration: none;
+    border-bottom: 1px solid #c77dff;
+    transition: all 0.3s ease-in-out;
+    font-weight: bold;
+}
+
+.createNewBtn:hover,
+footer a:hover {
+    color: #9d4edd;
+    border-color: #9d4edd;
+    text-shadow: 0 0 5px rgba(157, 78, 221, 0.5);
+}
+
+.mainWrap {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: 100vh;
+}
+
+.aside {
+    background: linear-gradient(180deg, rgba(15, 20, 40, 0.95) 0%, rgba(25, 30, 60, 0.9) 100%);
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    border-right: 2px solid rgba(157, 78, 221, 0.3);
+    backdrop-filter: blur(10px);
+}
+.asideInner {
+    flex: 1;
+}
+
+.clientsList {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.client {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(157, 78, 221, 0.1);
+    border: 1px solid rgba(157, 78, 221, 0.3);
+    transition: all 0.3s ease;
+}
+
+.client:hover {
+    background: rgba(157, 78, 221, 0.2);
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.3);
+}
+
+.userName {
+    margin-top: 10px;
+    color: #c77dff;
+}
+
+.logo {
+    border-bottom: 1px solid rgba(157, 78, 221, 0.4);
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.logoImage {
+    height: 60px;
+    filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.5));
+}
+
+.leaveBtn {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.copyBtn {
+    background: linear-gradient(45deg, #240046, #3c096c);
+    color: white;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid rgba(157, 78, 221, 0.3);
+}
+
+.copyBtn:hover {
+    background: linear-gradient(45deg, #3c096c, #5a189a);
+    box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+    transform: translateY(-1px);
+}
+
+.CodeMirror {
+    min-height: calc(100vh - 20px);
+    font-size: 18px;
+    line-height: 1.6;
+    padding-top: 20px;
+    background: rgba(10, 10, 30, 0.8) !important;
+    color: #fff !important;
+}
+
+.CodeMirror-gutters {
+    background: rgba(25, 25, 50, 0.9) !important;
+    border-right: 1px solid rgba(157, 78, 221, 0.3) !important;
+}
+
+.CodeMirror-linenumber {
+    color: #9d4edd !important;
+}
+
+/* Space theme animations and effects */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+.homePageWrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(157, 78, 221, 0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(199, 125, 255, 0.6), transparent),
+        radial-gradient(2px 2px at 160px 30px, #eee, transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: twinkle 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.formWrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 40px rgba(138, 43, 226, 0.4), inset 0 0 40px rgba(75, 0, 130, 0.2);
+}
+
+/* Cosmic button effects */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}

@@ -1,0 +1,9 @@
+{
+  "short_name": "Coco's Playground",
+  "name": "Coco's Playground - Collaborative Code Editor",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#9d4edd",
+  "background_color": "#0a0a0a"
+}
