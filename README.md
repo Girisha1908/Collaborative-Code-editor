@@ -1,5 +1,9 @@
 # Coco's Playground
 
+🚀 **[Live Demo](https://cocos-playground.onrender.com)** | 🔗 **[GitHub Repository](https://github.com/Girisha1908/Collaborative-Code-editor)**
+
+A real-time collaborative code editor designed for seamless pair programming, code reviews, and educational coding sessions.
+
 ## Problem Statement
 
 • **Remote Collaboration Barriers**: Developers, students, and coding teams face significant challenges when attempting to collaborate on code in real-time, especially in remote work environments. 
@@ -30,3 +34,15 @@
 
 ### APIs
 - **No External APIs**: The application is designed to be self-contained without dependencies on third-party services, ensuring privacy and reducing external points of failure. All functionality is handled internally through the Express server and Socket.IO connections.
+
+## Project Summary
+
+### 📋 **Project Objectives and Achievements**
+
+**Primary Objective**: Create an accessible, real-time collaborative code editor that eliminates barriers to pair programming and remote coding collaboration.
+
+**Key Achievements:**
+- ✅ **Real-time Synchronization**: Successfully implemented instant code synchronization across multiple users using Socket.IO, achieving sub-second latency for collaborative editing
+- ✅ **User-friendly Interface**: Developed a clean, space-themed UI that prioritizes functionality over complexity, making the platform accessible to beginners and professionals alike  
+- ✅ **Zero-setup Collaboration**: Eliminated complex authentication and setup procedures - users can start collaborating immediately with just a Room ID and username
+- ✅ **Cross-platform Compatibility**: Built a responsive web application that works seamlessly across different devices and browsers without requiring installations
