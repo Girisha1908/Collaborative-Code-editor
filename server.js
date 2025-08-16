@@ -71,4 +71,11 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+// Optimize for low memory
+if (process.env.NODE_ENV === 'production') {
+    // Reduce memory usage
+    process.env.NODE_OPTIONS = '--max_old_space_size=256';
+}
+
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
