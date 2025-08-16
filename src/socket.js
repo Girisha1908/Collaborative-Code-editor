@@ -7,7 +7,11 @@ export const initSocket = async () => {
         timeout: 10000,
         transports: ['websocket'],
     };
-    // Use localhost:5000 in development, otherwise use the environment variable
-    const serverUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    
+    // Simple production detection: if we're on render.com, use same origin
+    const isProduction = window.location.hostname.includes('onrender.com');
+    const serverUrl = isProduction ? window.location.origin : 'http://localhost:5000';
+    
+    console.log('Connecting to:', serverUrl);
     return io(serverUrl, options);
 };
