@@ -200,24 +200,6 @@ footer a:hover {
     transform: translateY(-1px);
 }
 
-.CodeMirror {
-    min-height: calc(100vh - 20px);
-    font-size: 18px;
-    line-height: 1.6;
-    padding-top: 20px;
-    background: rgba(10, 10, 30, 0.8) !important;
-    color: #fff !important;
-}
-
-.CodeMirror-gutters {
-    background: rgba(25, 25, 50, 0.9) !important;
-    border-right: 1px solid rgba(157, 78, 221, 0.3) !important;
-}
-
-.CodeMirror-linenumber {
-    color: #9d4edd !important;
-}
-
 /* Space theme animations and effects */
 @keyframes twinkle {
     0%, 100% { opacity: 0.3; }
@@ -268,4 +250,281 @@ footer a:hover {
 
 .btn:hover::before {
     left: 100%;
+}
+
+/* ---------- Cloud IDE layout ---------- */
+.brandTitle {
+    background: linear-gradient(45deg, #9d4edd, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.brandSub {
+    margin: 4px 0 0;
+    color: #b19cd9;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.asideHeading {
+    color: #c77dff;
+    text-align: center;
+}
+
+.editorWrap {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background: #0a0a1e;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    background: rgba(15, 20, 40, 0.95);
+    border-bottom: 1px solid rgba(157, 78, 221, 0.3);
+}
+
+.toolbarSpacer {
+    flex: 1;
+}
+
+.langSelect {
+    background: rgba(20, 25, 50, 0.9);
+    color: #fff;
+    border: 1px solid rgba(157, 78, 221, 0.4);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    outline: none;
+}
+
+.fileName {
+    color: #e0aaff;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 14px;
+}
+
+.saveState {
+    color: #7fdba0;
+    font-size: 12px;
+}
+
+.saveState.isDirty {
+    color: #b19cd9;
+}
+
+.toolBtn,
+.runBtn {
+    padding: 7px 16px;
+    font-size: 13px;
+}
+
+.toolBtn {
+    background: linear-gradient(45deg, #240046, #3c096c);
+    color: #fff;
+    border: 1px solid rgba(157, 78, 221, 0.4);
+}
+
+.runBtn {
+    background: linear-gradient(45deg, #2d6a4f, #40916c);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(64, 145, 108, 0.35);
+}
+
+.runBtn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.editorArea {
+    flex: 1;
+    min-height: 0;
+}
+
+.editorLoading {
+    color: #b19cd9;
+    padding: 20px;
+}
+
+.bottomPanel {
+    height: 34%;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    border-top: 2px solid rgba(157, 78, 221, 0.35);
+    background: #07071a;
+}
+
+.panelTabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px;
+    background: rgba(15, 20, 40, 0.95);
+    border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+}
+
+.panelTab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #b19cd9;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.panelTab.active {
+    color: #e0aaff;
+    border-bottom-color: #c77dff;
+}
+
+.panelBody {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.outputPane {
+    margin: 0;
+    height: 100%;
+    overflow: auto;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #e6e0ff;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.output-stderr {
+    color: #ff7aa2;
+}
+
+.output-meta,
+.outputMeta {
+    color: #9d8ec9;
+}
+
+.terminalPane {
+    height: 100%;
+    position: relative;
+}
+
+.terminalHost {
+    position: absolute;
+    inset: 6px 0 0 10px;
+}
+
+.reconnectBtn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    z-index: 2;
+    background: #3c096c;
+    color: #fff;
+    border: 1px solid rgba(157, 78, 221, 0.5);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+/* ---------- AI assistant ---------- */
+.aiPane {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.aiMessages {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #e6e0ff;
+}
+
+.aiSuggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.aiChip {
+    background: rgba(157, 78, 221, 0.15);
+    border: 1px solid rgba(157, 78, 221, 0.4);
+    color: #e0aaff;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.aiMsg {
+    margin-bottom: 12px;
+}
+
+.aiRole {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9d8ec9;
+}
+
+.aiMsg-assistant .aiRole {
+    color: #c77dff;
+}
+
+.aiText {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+}
+
+.aiCursor {
+    color: #c77dff;
+    animation: twinkle 1s steps(2) infinite;
+}
+
+.aiSources {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #7fdba0;
+}
+
+.aiInputRow {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid rgba(157, 78, 221, 0.2);
+}
+
+.aiInput {
+    flex: 1;
+    background: rgba(20, 25, 50, 0.9);
+    border: 1px solid rgba(157, 78, 221, 0.4);
+    border-radius: 6px;
+    color: #fff;
+    padding: 6px 10px;
+    font-size: 14px;
+    outline: none;
 }

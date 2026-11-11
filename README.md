@@ -1,67 +1,135 @@
-# Coco's Playground
+# CocoIDE: Collaborative Cloud IDE with Local AI
 
-🚀 **[Live Demo](https://cocos-playground.onrender.com)** 
+A containerized, browser-based cloud IDE with a local RAG coding assistant. Each room gets an isolated Docker sandbox. People edit together in the Monaco Editor, run multi-language code in the sandbox, and use live terminal shells streamed over WebSockets. Workspaces are saved in PostgreSQL, and a local LLM answers questions about the code with tokens streamed live.
 
-A real-time collaborative code editor designed for seamless pair programming, code reviews, and educational coding sessions.
+## Highlights
 
-## Problem Statement
+- **Isolated Docker sandboxes per room.** The server creates and manages containers through the Docker Engine SDK ([dockerode](https://github.com/apocas/dockerode)). Each sandbox has:
+  - no network
+  - a read-only root filesystem with tmpfs `/workspace`
+  - a non-root user and all capabilities dropped
+  - `no-new-privileges`
+  - limits of 512 MB memory, 1 CPU and 256 PIDs
+  - a hard time limit on every run
+- **Multi-language runs.** Supported languages are Python, JavaScript (Node), C, C++, Java, Go and Bash. Output (stdout and stderr) streams live to everyone in the room.
+- **Interactive terminals.** xterm.js connects over a WebSocket (`/ws/terminal`) to a TTY `docker exec` bash shell inside the room's container. Terminals resize with the browser window.
+- **Monaco Editor.** This is the VS Code editor, with real-time collaboration through Socket.IO edit deltas plus self-healing full-document sync.
+- **PostgreSQL workspaces.** The server keeps the authoritative copy of every open room and saves it to Postgres (debounced, on <kbd>Ctrl+S</kbd>, and when the last member leaves). Reopening a room restores its code and language.
+- **Local RAG assistant.** Code is split into overlapping 40-line chunks, embedded with `nomic-embed-text` and stored in **pgvector**. For each question, the top-k chunks (by cosine similarity) plus the last run's output go to a local model (Ollama, which runs llama.cpp under the hood). Tokens stream to the browser over Socket.IO as they are generated, and the user can stop them. Nothing leaves the machine. If the embedding model is unavailable, it falls back to sending the start of the file as context.
+- **Lifecycle management.** A sandbox starts lazily and is removed after it has been idle (`SANDBOX_IDLE_MS`). Leftover containers are cleaned up when the server starts and stops.
 
-• **Remote Collaboration Barriers**: Developers, students, and coding teams face significant challenges when attempting to collaborate on code in real-time, especially in remote work environments. 
+## Architecture
 
-•Many existing collaborative coding platforms are either too complex for casual use, require expensive subscriptions, or demand extensive technical setup that creates barriers for beginners, students, and small teams. This lack of accessible, user-friendly solutions prevents effective pair programming, code reviews, technical interviews, and educational coding sessions from happening seamlessly.
+```
+Browser (React)                         Node server                          Docker Engine
+┌───────────────────┐  Socket.IO   ┌─────────────────────────┐  dockerode  ┌──────────────────────────┐
+│ Monaco Editor     │◄────────────►│ rooms: code + language  │────────────►│ coco-sandbox-<roomId>    │
+│ Output panel      │  edits/run   │ run → docker exec       │   exec      │  python, node, gcc, g++, │
+│ xterm.js terminal │◄────────────►│ /ws/terminal ↔ TTY exec │◄───────────►│  java, go, bash          │
+└───────────────────┘  WebSocket   └───────────┬─────────────┘             │  --network none, tmpfs   │
+                                               │ pg                        └──────────────────────────┘
+                                         ┌─────▼──────┐   embed / chat (SSE)   ┌──────────────────────┐
+                                         │ PostgreSQL │◄──── server/rag.js ───►│ Ollama (llama.cpp)   │
+                                         │ + pgvector │                        │ qwen2.5-coder · nomic │
+                                         └────────────┘                        └──────────────────────┘
+   workspaces(room_id, language, code) · code_chunks(room_id, lines, content, embedding vector)
+```
 
+| Path | Purpose |
+| --- | --- |
+| `server/index.js` | Express, Socket.IO rooms, run orchestration, save scheduling |
+| `server/sandbox.js` | Docker Engine SDK: create, harden, exec, run and tear down sandboxes |
+| `server/terminal.js` | WebSocket ↔ `docker exec` TTY bridge for xterm.js |
+| `server/rag.js` | RAG: chunking, embeddings, pgvector search, streaming chat completions |
+| `src/components/AiPanel.js` | AI chat panel with live token streaming |
+| `server/store.js` | PostgreSQL workspace persistence (falls back to memory without `DATABASE_URL`) |
+| `sandbox/Dockerfile` | Multi-language sandbox image |
+| `src/languages.js` | Language registry shared by client and server |
+| `src/components/Editor.js` | Monaco Editor with collaborative deltas |
+| `src/components/Terminal.js` | xterm.js terminal client |
 
-## Technical Stack
+## Running locally
 
-### Frontend
-- **React 17.0.2**: Core JavaScript library for building the user interface with component-based architecture
-- **React Router DOM 6.2.1**: Client-side routing for seamless navigation between pages
-- **CodeMirror 5.65.2**: Powerful code editor component with syntax highlighting and real-time collaboration features
-- **React Hot Toast 2.2.0**: Toast notification system for user feedback and status updates
-- **React Avatar 4.0.0**: Dynamic avatar generation for user identification in collaborative sessions
-- **Socket.IO Client 4.4.1**: Real-time bidirectional communication between frontend and backend
-- **UUID 8.3.2**: Unique identifier generation for rooms and user sessions
+Prerequisites: Node 18 or later, Docker (Docker Desktop on Windows or macOS) and, for the AI assistant, [Ollama](https://ollama.com).
 
-### Backend
-- **Node.js**: JavaScript runtime environment for server-side execution
-- **Express.js 4.17.3**: Minimal web application framework for building RESTful APIs and handling HTTP requests
-- **Socket.IO 4.4.1**: Real-time WebSocket communication for collaborative editing and user presence
-- **CORS**: Cross-Origin Resource Sharing middleware for handling frontend-backend communication
+```bash
+npm install
+npm run sandbox:build        # builds coco-sandbox:latest (one-time, a few minutes)
+docker compose up -d db      # PostgreSQL on localhost:5432 (set DB_PORT=5433 if 5432 is taken)
+ollama pull qwen2.5-coder:3b     # chat model (~2 GB; use :7b with a GPU)
+ollama pull nomic-embed-text     # embedding model (~270 MB)
+cp .env.example .env         # adjust DATABASE_URL if you changed the port
+```
 
-### Database
-- **In-Memory Storage**: Currently uses server-side memory for storing active room data and user sessions (suitable for development and small-scale deployment)
-- **Session Management**: Real-time user presence and code synchronization handled through Socket.IO connections
+Then, in two terminals:
 
-### APIs
-- **No External APIs**: The application is designed to be self-contained without dependencies on third-party services, ensuring privacy and reducing external points of failure. All functionality is handled internally through the Express server and Socket.IO connections.
+```bash
+DATABASE_URL=postgres://coco:coco@localhost:5432/coco npm run server:dev   # API + WebSockets on :5000
+npm run start:front                                                         # React dev server on :3000
+```
 
-## Project Summary
+Open http://localhost:3000, create a room, and share the Room ID.
 
-### 📋 **Project Objectives and Achievements**
+For a production-style run, `npm start` builds the React app and serves everything from `:5000`.
 
-**Primary Objective**: Create an accessible, real-time collaborative code editor that eliminates barriers to pair programming and remote coding collaboration.
+## Running everything in Docker
 
-**Key Achievements:**
-- ✅ **Real-time Synchronization**: Successfully implemented instant code synchronization across multiple users using Socket.IO, achieving sub-second latency for collaborative editing
-- ✅ **User-friendly Interface**: Developed a clean, space-themed UI that prioritizes functionality over complexity, making the platform accessible to beginners and professionals alike  
-- ✅ **Zero-setup Collaboration**: Eliminated complex authentication and setup procedures - users can start collaborating immediately with just a Room ID and username
-- ✅ **Cross-platform Compatibility**: Built a responsive web application that works seamlessly across different devices and browsers without requiring installations
-- ✅ **Privacy-focused Design**: Implemented in-memory storage ensuring no persistent data collection, addressing privacy concerns common with other collaborative platforms
+```bash
+docker compose --profile build build   # builds the sandbox image and the app image
+docker compose up -d                   # app on http://localhost:5000 + PostgreSQL + Ollama
+docker compose exec ollama ollama pull qwen2.5-coder:3b
+docker compose exec ollama ollama pull nomic-embed-text
+```
 
-**Effectiveness Assessment**: The final application successfully achieves 95% of the stated objectives, providing a robust, accessible platform for real-time code collaboration that addresses the core problems identified in remote development workflows.
+The app container mounts `/var/run/docker.sock` so it can create sibling sandbox containers.
 
-## 🚀 **Future Enhancements & Expansions**
+> **Security note:** access to the Docker socket is root-equivalent on the host. Run this on a dedicated VM or host, and put authentication in front of it before exposing it publicly. Managed platforms without Docker socket access (such as Render's free tier) can host the editor, but Run and Terminal won't work there.
 
-**Enhanced Code Editor Capabilities**
-- **Monaco Editor Integration**: Replace CodeMirror with Microsoft's Monaco Editor (VS Code's editor) for advanced features like IntelliSense, error squiggles, and multi-cursor editing
+## Configuration
 
-**Advanced Collaboration Tools**
-- **Video/Audio Communication**: Integrate WebRTC for real-time voice and video calls during coding sessions, supporting screen sharing and collaborative debugging
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PORT` | `5000` | HTTP/WebSocket port |
+| `DATABASE_URL` | – | PostgreSQL connection string (in-memory if unset) |
+| `PGSSL` | `false` | Set `true` for managed Postgres that requires SSL |
+| `CLIENT_ORIGIN` | `http://localhost:3000` | Allowed CORS origin(s), comma-separated |
+| `SANDBOX_IMAGE` | `coco-sandbox:latest` | Image used for sandboxes |
+| `SANDBOX_RUN_TIMEOUT` | `10` | Seconds before a run is killed |
+| `SANDBOX_IDLE_MS` | `300000` | Remove a room's container this long after its last user leaves |
+| `SANDBOX_MAX` | `20` | Maximum concurrent sandboxes |
+| `MAX_TERMINALS_PER_ROOM` | `8` | Terminal sessions allowed per room |
+| `LLM_URL` | `http://localhost:11434` | OpenAI-compatible chat server (Ollama or llama.cpp `llama-server`) |
+| `LLM_MODEL` | `qwen2.5-coder:3b` | Chat model name |
+| `EMBED_URL` | `LLM_URL` | OpenAI-compatible embeddings server |
+| `EMBED_MODEL` | `nomic-embed-text` | Embedding model name |
+| `RAG_TOP_K` | `4` | Code chunks retrieved per question |
+| `LLM_MAX_TOKENS` | `512` | Maximum answer length |
 
-- **Collaborative Debugging**: Shared debugging sessions with breakpoint synchronization, variable inspection, and step-through debugging across multiple users
+## Keyboard shortcuts
 
-- **Whiteboard Integration**: Add collaborative drawing canvas for system design discussions, algorithm visualization, and architectural planning
+| Shortcut | Action |
+| --- | --- |
+| <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>Enter</kbd> | Run the current file in the sandbox |
+| <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>S</kbd> | Save the workspace to PostgreSQL |
 
+## Tech stack
 
+**Frontend:** React 17, Monaco Editor (`@monaco-editor/react`), xterm.js (`@xterm/xterm` + fit addon), Socket.IO client, React Router, React Hot Toast
 
+**Backend:** Node.js, Express, Socket.IO, `ws`, Docker Engine SDK (`dockerode`), PostgreSQL (`pg`) + pgvector
 
+**AI:** Ollama / llama.cpp (Qwen2.5-Coder, nomic-embed-text), retrieval-augmented generation, streaming over SSE → Socket.IO
+
+**Infrastructure:** Docker and Docker Compose, Debian-based multi-language sandbox image
+
+## Future enhancements
+
+- CRDT-based editing (Yjs) for conflict-free concurrent edits and shared cursors
+- Multi-file workspaces with a file tree, synced into the sandbox
+- Authentication and per-user workspace ownership
+- gVisor or Firecracker runtime for stronger sandbox isolation
+- WebRTC voice and video during sessions
+
+---
+
+Made by [girisha1908](https://github.com/girisha1908)

@@ -1,0 +1,59 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16   # Postgres 16 + pgvector for RAG embeddings
+    environment:
+      POSTGRES_USER: coco
+      POSTGRES_PASSWORD: coco
+      POSTGRES_DB: coco
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coco"]
+      interval: 5s
+      retries: 10
+
+  # Local LLM runtime (llama.cpp under the hood). Pull models once:
+  #   docker compose exec ollama ollama pull qwen2.5-coder:3b
+  #   docker compose exec ollama ollama pull nomic-embed-text
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    # Uncomment for NVIDIA GPU acceleration:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+
+  # Builds the multi-language image that every room sandbox is created from.
+  # `docker compose build` builds it; it is never started as a service.
+  sandbox-image:
+    build: ./sandbox
+    image: coco-sandbox:latest
+    profiles: ["build"]
+
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgres://coco:coco@db:5432/coco
+      CLIENT_ORIGIN: http://localhost:5000
+      SANDBOX_IMAGE: coco-sandbox:latest
+      LLM_URL: http://ollama:11434
+      LLM_MODEL: qwen2.5-coder:3b
+      EMBED_MODEL: nomic-embed-text
+    volumes:
+      # The server provisions sandboxes through the host's Docker Engine.
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  ollama:

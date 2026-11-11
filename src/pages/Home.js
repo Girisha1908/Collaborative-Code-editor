@@ -50,7 +50,7 @@ const Home = () => {
                         Coco's Playground
                     </h1>
                     <p style={{ color: '#b19cd9', margin: '10px 0 0 0', fontSize: '1.1rem' }}>
-                        Collaborative Code Editor
+                        Collaborative Cloud IDE
                     </p>
                 </div>
                 <h4 className="mainLabel">Enter Room ID</h4>
