@@ -1,6 +1,6 @@
-# CocoIDE: Collaborative Cloud IDE with Local AI
+# CocoIDE: Collaborative Code Editor
 
-A containerized, browser-based cloud IDE with a local RAG coding assistant. Each room gets an isolated Docker sandbox. People edit together in the Monaco Editor, run multi-language code in the sandbox, and use live terminal shells streamed over WebSockets. Workspaces are saved in PostgreSQL, and a local LLM answers questions about the code with tokens streamed live.
+A collaborative browser-based cloud IDE with a local RAG coding assistant. Each room gets an isolated Docker sandbox. People edit together in the Monaco Editor, run multi-language code in the sandbox, and use live terminal shells streamed over WebSockets. Workspaces are saved in PostgreSQL, and a local LLM answers questions about the code with tokens streamed live.
 
 ## Highlights
 
